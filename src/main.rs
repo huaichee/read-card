@@ -1,31 +1,21 @@
 use calamine::{open_workbook_auto, DataType, Range, Reader};
-use std::env;
+// use std::env;
 use std::path::PathBuf;
 use xlsxwriter::prelude::*;
-use pcsc::*;
+// use pcsc::*;
 use chrono::{DateTime, Local};
 
 fn main() {
-    // converts first argument into a csv (same name, silently overrides
-    // if the file already exists
-
-    let file = env::args()
-        .nth(1)
-        .expect("Please provide an excel file to convert");
-    let sheet = env::args()
-        .nth(2)
-        .expect("Expecting a sheet name as second argument");
-
-    let sce = PathBuf::from(file);
+    let sce = PathBuf::from("test.xlsx");
     match sce.extension().and_then(|s| s.to_str()) {
         Some("xlsx") | Some("xlsm") | Some("xlsb") | Some("xls") => (),
         _ => panic!("Expecting an excel file"),
     }
 
     let mut xl = open_workbook_auto(&sce).unwrap();
-    let range = xl.worksheet_range(&sheet).unwrap().unwrap();
+    let range = xl.worksheet_range("staff").unwrap().unwrap();
 
-    let card_no = "wefwefwefw";
+    let card_no = "Poekoas";
 
     write_workbook(&range, &card_no).unwrap();
 }
@@ -33,7 +23,7 @@ fn main() {
 fn write_workbook(range: &Range<DataType>, card_no: &str) -> Result<(), XlsxError>{
     let workbook = Workbook::new("simple1.xlsx")?;
 
-    let mut sheet1 = workbook.add_worksheet(Some("Staff"))?;
+    let mut sheet1 = workbook.add_worksheet(Some("data"))?;
 
     let mut row = 0;
     for r in range.rows() {
