@@ -2,6 +2,8 @@ use calamine::{open_workbook_auto, DataType, Range, Reader};
 use std::env;
 use std::path::PathBuf;
 use xlsxwriter::prelude::*;
+use pcsc::*;
+use chrono::{DateTime, Local};
 
 fn main() {
     // converts first argument into a csv (same name, silently overrides
@@ -23,10 +25,12 @@ fn main() {
     let mut xl = open_workbook_auto(&sce).unwrap();
     let range = xl.worksheet_range(&sheet).unwrap().unwrap();
 
-    write_workbook(&range).unwrap();
+    let card_no = "wefwefwefw";
+
+    write_workbook(&range, &card_no).unwrap();
 }
 
-fn write_workbook(range: &Range<DataType>) -> Result<(), XlsxError>{
+fn write_workbook(range: &Range<DataType>, card_no: &str) -> Result<(), XlsxError>{
     let workbook = Workbook::new("simple1.xlsx")?;
 
     let mut sheet1 = workbook.add_worksheet(Some("Staff"))?;
@@ -57,7 +61,15 @@ fn write_workbook(range: &Range<DataType>) -> Result<(), XlsxError>{
                 DataType::Error(ref e) => Ok(()),
                 DataType::Bool(b) => sheet1.write_boolean(row, col, b.to_owned(), None),
             }?;
-            
+
+            if col == 5 && c == &DataType::Empty {
+                let now: DateTime<Local> = Local::now();
+                let formatted_date_time = now.format("%m/%d/%Y %r").to_string();
+                
+                let _ = sheet1.write_string(row, col, card_no, None); 
+                let _ = sheet1.write_string(row, col + 1, &formatted_date_time, None); 
+            }
+
         }
         row += 1;
     }
