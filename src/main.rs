@@ -41,10 +41,10 @@ fn write_workbook(range: &Range<DataType>) -> Result<(), XlsxError>{
                 DataType::String(ref s)
                 | DataType::DateTimeIso(ref s)
                 | DataType::DurationIso(ref s) => if row == 0 { 
-                    let mut bg_color = FormatColor::Cyan;
-                    if col == 5 {
-                        bg_color = FormatColor::Yellow;
-                    }
+                    let bg_color = match col {
+                        5 => FormatColor::Yellow,
+                        _ => FormatColor::Cyan
+                    };
 
                     sheet1.write_string(row, col, s, Some(&Format::new().set_bg_color(bg_color).set_border(FormatBorder::Thin))) 
                 } else { 
